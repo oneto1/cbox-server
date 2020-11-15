@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 func getServerIp(c *gin.Context) {
@@ -89,14 +88,16 @@ func getTodo(c *gin.Context) {
 	if err != nil {
 		c.String(500, "can't get keys")
 	} else {
-		r := strings.Split("", "")
+		r := ""
 		for _, v := range keys {
-			r = append(r, v, "\n")
+
+			r, _ = sjson.Set(r, "title.-1", v)
 			value, _ := db.Client.Get(db.Ctx, v).Result()
-			r = append(r, value, "\n")
+			r, _ = sjson.Set(r, "data.-1", value)
 
 		}
-		c.String(200, strings.Join(r, ""))
+
+		c.String(200, r)
 	}
 
 	defer db.dbClose()
@@ -255,5 +256,8 @@ func postShortUrl(c *gin.Context) {
 }
 
 func delShortUrl(c *gin.Context) {
+
+}
+func getDu(c *gin.Context) {
 
 }
