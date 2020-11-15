@@ -8,10 +8,10 @@ import (
 
 func main() {
 
-	r := gin.Default()
-
-	f, _ := os.Create("log")
+	f, _ := os.Create("cbox.log")
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
+	r := gin.Default()
 
 	// _cat api group
 	_cat := r.Group("/_cat")
