@@ -4,56 +4,38 @@ import (
 	"github.com/antchfx/htmlquery"
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly"
+	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 )
 
 func getServerIp(c *gin.Context) {
-	//
-	//	ua := "Mozilla/5.0 (Linux; Android 7.1.1; OPPO R9sk) AppleWebKit/537.36 " +
-	//		"(KHTML, like Gecko) Chrome/76.0.3809.111 Mobile Safari/537.36\""
-	//	var client = colly.NewCollector(
-	//		colly.UserAgent(ua),
-	//	)
-	//
-	//	client.OnHTML("body > p:nth-child(1)",
-	//		func(element *colly.HTMLElement) {
-	//
-	//			serverIp = element.chAttr("target")
-	//
-	//
-	//		})
-	//req, _ := http.NewRequest("GET", "https://tool.lu/ip", nil)
-	//
-	//req.Header.Add("User-Agent", "Mozilla/5.0 (Linux; Android 7.1.1; OPPO R9sk) AppleWebKit/537.36 " +
-	//	"(KHTML, like Gecko) Chrome/76.0.3809.111 Mobile Safari/537.36\"")
-	////r, err := http.Get("http://127.0.0.1:55556/books/sdfa")
-	//
-	//client := &http.Client{
-	//	Transport:     nil,
-	//
-	//	CheckRedirect: nil,
-	//	Jar:           nil,
-	//	Timeout:       3,
-	//}
-	//
-	//res, err := client.Do(req)
-	//
-	//if err != nil {
-	//	log.Fatal("get server ip error ")
-	//}
 
-	//body, err := ioutil.ReadAll(res.Body)
+	t := "https://httpbin.org/ip"
 
-	//rootNode,_ := htmlquery.Parse(res.Body)
-	//node := htmlquery.FindOne(rootNode,"/html/body/div[2]/div[5]/div/div[1]/div/form/p[1]")
-	//
-	//serverIp := htmlquery.InnerText(node)
-	//_ = client.Visit("https://ip138.com")
+	response, err := http.Get(t)
 
-	c.String(200, "notok,yet")
+	if err != nil {
+		c.String(500, "get server ip error")
+		return
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+
+	if err != nil {
+		c.String(500, "get server ip then read data error")
+		return
+	}
+
+	val := string(data)
+
+	res := gjson.Get(val, "origin").String()
+
+	c.String(200, res)
 }
 
 func getClientIp(c *gin.Context) {
@@ -74,7 +56,6 @@ func getWeather(c *gin.Context) {
 	}
 
 	t := u.String()
-
 
 	doc, err := htmlquery.LoadURL(t)
 	if err != nil {
@@ -139,20 +120,11 @@ func postTodo(c *gin.Context) {
 
 	db.dbInit()
 
-	//db.Client.RPush(db.Ctx,key,value)
+	res := db.Client.Set(db.Ctx, key, value, 0)
 
-	err := db.Client.Set(db.Ctx, key, value, 0)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	val := db.Client.Get(db.Ctx, key)
-
-	c.String(200, val.String())
+	c.String(200, res.String())
 
 	defer db.dbClose()
-	//rdb.Set(ctx,)
 
 }
 
@@ -161,7 +133,7 @@ func delTodo(c *gin.Context) {
 	name := c.Param("name")
 
 	if name == "" {
-		c.String(400, "wrong par")
+		c.String(400, "wrong param")
 		return
 	}
 
@@ -261,10 +233,9 @@ func getIthomeNew(c *gin.Context) {
 
 }
 
-func postIthomeNew(c *gin.Context){
+func postIthomeNew(c *gin.Context) {
 
 }
-
 
 func getDownload(c *gin.Context) {
 }
@@ -274,7 +245,6 @@ func postDownload(c *gin.Context) {
 
 func delDownload(c *gin.Context) {
 }
-
 
 func getShortUrl(c *gin.Context) {
 

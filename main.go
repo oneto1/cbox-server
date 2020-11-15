@@ -6,7 +6,6 @@ import (
 	"os"
 )
 
-
 func main() {
 
 	r := gin.Default()
@@ -54,13 +53,13 @@ func main() {
 
 		api.POST("/shortUrl", postShortUrl)
 
-		api.DELETE("/shortUrl", delShortUrl)
+		api.DELETE("/shortUrl/:url", delShortUrl)
 
 	}
 
 	// running at tls
-	_ = r.RunTLS(":55557", "/etc/nginx/notok.cf.cer", "/etc/nginx/notok.cf.key")
+	//_ = r.RunTLS(":55557", "/etc/nginx/notok.cf.cer", "/etc/nginx/notok.cf.key")
 
-	//_ = r.Run(":55557")
+	_ = r.Run(":55557")
 
 }
