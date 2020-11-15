@@ -81,12 +81,13 @@ func getTodo(c *gin.Context) {
 
 	db.dbInit()
 
-	res := db.Client.Keys(db.Ctx, "*")
+	res := db.Client.LRange(db.Ctx, "todo", 0, -1)
 
 	keys, err := res.Result()
 
 	if err != nil {
-		c.String(500, "can't get keys")
+		c.String(500, "getTodo get range error ")
+		return
 	} else {
 		r := ""
 		for _, v := range keys {
@@ -110,7 +111,7 @@ func postTodo(c *gin.Context) {
 	value := c.PostForm("value")
 
 	if key == "" && value == "" {
-		c.String(400, "wrong request")
+		c.String(400, "postTodo get param error")
 		return
 	}
 
@@ -121,9 +122,25 @@ func postTodo(c *gin.Context) {
 
 	db.dbInit()
 
-	res := db.Client.Set(db.Ctx, key, value, 0)
+	setRes := db.Client.Set(db.Ctx, key, value, 0)
 
-	c.String(200, res.String())
+	if _, err := setRes.Result(); err != nil {
+
+		c.String(500, "posTodo set string error")
+		return
+	}
+
+	pushRes := db.Client.RPush(db.Ctx, "todo", key)
+
+	if _, err := pushRes.Result(); err != nil {
+
+		_ = db.Client.Del(db.Ctx, key) // error rollback
+
+		c.String(500, "posTodo push string error")
+		return
+	}
+
+	c.String(200, "posTodo ok")
 
 	defer db.dbClose()
 
@@ -134,7 +151,7 @@ func delTodo(c *gin.Context) {
 	name := c.Param("name")
 
 	if name == "" {
-		c.String(400, "wrong param")
+		c.String(400, "delTodo get param error")
 		return
 	}
 
@@ -145,11 +162,16 @@ func delTodo(c *gin.Context) {
 
 	db.dbInit()
 
-	res := db.Client.Del(db.Ctx, name)
+	delRes := db.Client.Del(db.Ctx, name)
 
-	_, err := res.Result()
-	if err != nil {
+	remRes := db.Client.LRem(db.Ctx, "todo", 0, name)
+
+	_, err := delRes.Result()
+	_, err2 := remRes.Result()
+
+	if err != nil || err2 != nil {
 		c.String(500, "del error")
+		return
 	} else {
 		c.String(200, "del success")
 	}
