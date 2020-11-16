@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var debug = os.Getenv("cbox_debug")
+
 func main() {
 
 	f, _ := os.Create("cbox.log")
@@ -21,6 +23,8 @@ func main() {
 		_cat.GET("/clientIp", getClientIp)
 
 		_cat.GET("/weather/:city", getWeather)
+
+		_cat.GET("/toDoApiAddr", getToDoApiAddr)
 	}
 
 	// do api group
@@ -57,9 +61,13 @@ func main() {
 
 	}
 
-	// running at tls
-	//_ = r.RunTLS(":55557", "/etc/nginx/notok.cf.cer", "/etc/nginx/notok.cf.key")
+	if debug == "1" {
+		_ = r.Run(":55557")
+	} else {
+		// running at tls
+		_ = r.RunTLS(":55557", "/etc/nginx/notok.cf.cer",
+			"/etc/nginx/notok.cf.key")
 
-	_ = r.Run(":55557")
+	}
 
 }

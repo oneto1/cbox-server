@@ -72,6 +72,19 @@ func getWeather(c *gin.Context) {
 
 }
 
+func getToDoApiAddr(c *gin.Context) {
+
+	httpUrl := "http://notok.cf:55557/api/todo"
+	httpsUrl := "https://notok.cf:55557/api/todo"
+
+	if debug == "1" {
+		c.String(200, httpUrl)
+	} else {
+		c.String(200, httpsUrl)
+	}
+
+}
+
 func getTodo(c *gin.Context) {
 
 	db := db{
