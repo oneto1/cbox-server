@@ -25,6 +25,8 @@ func main() {
 		_cat.GET("/weather/:city", getWeather)
 
 		_cat.GET("/toDoApiAddr", getToDoApiAddr)
+
+		_cat.GET("/du", getDu)
 	}
 
 	// do api group

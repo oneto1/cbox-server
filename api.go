@@ -9,9 +9,11 @@ import (
 	"github.com/tidwall/sjson"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 func getServerIp(c *gin.Context) {
@@ -395,5 +397,24 @@ func delShortUrl(c *gin.Context) {
 
 }
 func getDu(c *gin.Context) {
+	db := db{
+		Ctx:    nil,
+		Client: nil,
+	}
 
+	db.dbInit()
+
+	defer db.dbClose()
+
+	num := rand.Uint64() % 1219
+
+	res := db.Client.LRange(db.Ctx, "du", int64(num), int64(num))
+
+	val, err := res.Result()
+	if err != nil {
+		c.String(500, "getDu error:%s", err.Error())
+		return
+	}
+
+	c.String(200, strings.Join(val, ""))
 }
