@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/antchfx/htmlquery"
+	"github.com/cavaliercoder/grab"
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly"
 	"github.com/tidwall/gjson"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 func getServerIp(c *gin.Context) {
@@ -274,12 +276,111 @@ func postIthomeNew(c *gin.Context) {
 }
 
 func getDownload(c *gin.Context) {
+	db := db{
+		Ctx:    nil,
+		Client: nil,
+	}
+
+	db.dbInit()
+
+	res, err := db.Client.LRange(db.Ctx, "download", 0, -1).Result()
+
+	if err != nil {
+		c.String(500, "getDownload get data error : %s", err.Error())
+	}
+
+	jsonReturn := ""
+
+	for _, v := range res {
+		jsonReturn, _ = sjson.Set(jsonReturn, "download.-1", v)
+
+		res := db.Client.HMGet(db.Ctx, v, "url", "progress", "done")
+
+		for i, val := range res.Val() {
+			switch i {
+			case 0:
+				jsonReturn, _ = sjson.Set(jsonReturn, "url.-1", val)
+			case 1:
+				jsonReturn, _ = sjson.Set(jsonReturn, "progress.-1", val)
+			case 2:
+				jsonReturn, _ = sjson.Set(jsonReturn, "done.-1", val)
+
+			}
+		}
+
+	}
+
+	c.String(200, jsonReturn)
 }
 
 func postDownload(c *gin.Context) {
+	target := c.PostForm("target")
+
+	if target == "" {
+		c.String(400, "postDownload get param error")
+		return
+	}
+
+	client := grab.NewClient()
+
+	request, _ := grab.NewRequest(".", target)
+
+	response := client.Do(request)
+
+	if response.Err() != nil {
+		c.String(500, "postDownload start download error:"+
+			response.Err().Error())
+		return
+	}
+
+	filename := response.Filename
+
+	db := db{
+		Ctx:    nil,
+		Client: nil,
+	}
+
+	db.dbInit()
+
+	db.Client.RPush(db.Ctx, "download", filename)
+
+	db.Client.HMSet(db.Ctx, filename, "url", target, "progress", "0",
+		"done", "false")
+
+	defer db.dbClose()
+
+	c.String(200, "start download , file name is %s", filename)
 }
 
 func delDownload(c *gin.Context) {
+
+	filename := c.Param("filename")
+
+	if filename == "" {
+		c.String(400, "delDownload get param error")
+
+		return
+	}
+
+	db := db{
+		Ctx:    nil,
+		Client: nil,
+	}
+
+	db.dbInit()
+
+	db.Client.LRem(db.Ctx, "download", 0, filename)
+	db.Client.HDel(db.Ctx, filename, "url", "progress", "done")
+
+	err := os.Remove(filename)
+
+	if err != nil {
+		c.String(500, "delDownload del file error:%s", err.Error())
+		return
+	}
+
+	c.String(200, "delDownload success")
+
 }
 
 func getShortUrl(c *gin.Context) {

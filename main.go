@@ -59,6 +59,12 @@ func main() {
 
 		api.DELETE("/shortUrl/:url", delShortUrl)
 
+		api.GET("download", getDownload)
+
+		api.POST("/download", postDownload)
+
+		api.DELETE("download/:filename", delDownload)
+
 	}
 
 	if debug == "1" {
