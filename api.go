@@ -139,6 +139,28 @@ func postTodo(c *gin.Context) {
 
 	db.dbInit()
 
+	request := db.Client.Get(db.Ctx, key)
+
+	res, err := request.Result()
+
+	if err != nil && err.Error() != "redis: nil" {
+		c.String(500, "posTodo set string error:%s", err.Error())
+		return
+	}
+
+	if res == "" {
+
+		pushRes := db.Client.RPush(db.Ctx, "todo", key)
+
+		if _, err := pushRes.Result(); err != nil {
+
+			_ = db.Client.Del(db.Ctx, key) // error rollback
+
+			c.String(500, "posTodo push string error")
+			return
+		}
+	}
+
 	setRes := db.Client.Set(db.Ctx, key, value, 0)
 
 	if _, err := setRes.Result(); err != nil {
@@ -147,20 +169,9 @@ func postTodo(c *gin.Context) {
 		return
 	}
 
-	pushRes := db.Client.RPush(db.Ctx, "todo", key)
-
-	if _, err := pushRes.Result(); err != nil {
-
-		_ = db.Client.Del(db.Ctx, key) // error rollback
-
-		c.String(500, "posTodo push string error")
-		return
-	}
-
-	c.String(200, "posTodo ok")
-
 	defer db.dbClose()
 
+	c.String(200, "posTodo ok")
 }
 
 func delTodo(c *gin.Context) {
