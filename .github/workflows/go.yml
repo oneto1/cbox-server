@@ -1,0 +1,32 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  watch:
+    types: [started]
+ 
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14
+    - name: Clone code
+      run: git clone https://github.com/oneto1/cbox-server
+
+    - name: Build
+      run: go build -v ./...
+      
+    - name : Upload packages
+      uses: actions/upload-artifact@master
+      with:
+        path: cbox-server
