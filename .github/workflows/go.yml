@@ -27,9 +27,9 @@ jobs:
       run: cd cbox-server
 
     - name: Build
-      run: go build .
+      run: go build -o cboxserver .
       
     - name : Upload packages
       uses: actions/upload-artifact@master
       with:
-        path: cbox-server
+        path: cboxserver
