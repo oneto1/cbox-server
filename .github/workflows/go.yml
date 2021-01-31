@@ -21,7 +21,10 @@ jobs:
       with:
         go-version: 1.14
     - name: Clone code
-      run: git clone https://github.com/oneto1/cbox-server
+      run: git clone https://github.com/oneto1/cbox-server 
+    
+    - name: Enter dir
+      run: cd cbox-server
 
     - name: Build
       run: go build .
