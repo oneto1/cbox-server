@@ -1,16 +1,35 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"io"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/namsral/flag"
 )
 
 var debug = os.Getenv("cbox_debug")
 
 func main() {
 
-	f, _ := os.Create("cbox.log")
+	var cerPath string
+	var keyPath string
+	var addr string
+	var logPath string
+
+	flag.StringVar(
+		&keyPath, "k", "/etc/nginx/notok.cf.key", "tls key path")
+
+	flag.StringVar(
+		&cerPath, "c", "/etc/nginx/notok.cf.cer", "tls cer path")
+
+	flag.StringVar(
+		&addr, "a", ":55557", "port")
+
+	flag.StringVar(
+		&logPath, "d", "./", "log path")
+
+	f, _ := os.Create(logPath + "/cbox.log")
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	r := gin.Default()
@@ -73,8 +92,7 @@ func main() {
 		_ = r.Run(":55557")
 	} else {
 		// running at tls
-		_ = r.RunTLS(":55557", "/etc/nginx/notok.cf.cer",
-			"/etc/nginx/notok.cf.key")
+		_ = r.RunTLS(addr, cerPath, keyPath)
 
 	}
 

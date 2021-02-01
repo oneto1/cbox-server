@@ -1,5 +1,7 @@
 .idea/
+.vscode/
 
+cbox-server
 log
 *.exe
 go_build*
