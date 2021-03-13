@@ -70,6 +70,8 @@ func main() {
 
 		api.GET("/toDo", getTodo)
 
+		api.GET("toDo/:name", getOneTodo)
+
 		api.POST("/toDo", postTodo)
 
 		api.DELETE("/toDo/:name", delTodo)

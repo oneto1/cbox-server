@@ -121,6 +121,35 @@ func getTodo(c *gin.Context) {
 	defer db.dbClose()
 }
 
+func getOneTodo(c *gin.Context) {
+
+	name := c.Param("name")
+
+	if name == "" {
+		c.String(400, "getOneTodo get param error")
+		return
+	}
+
+	db := db{
+		Ctx:    nil,
+		Client: nil,
+	}
+
+	db.dbInit()
+
+	res, err := db.Client.Get(db.Ctx, name).Result()
+
+	if err != nil {
+		c.Redirect(http.StatusMovedPermanently, res)
+	} else {
+		c.String(500, "getOneTodo get value error ")
+		return
+	}
+
+	defer db.dbClose()
+
+}
+
 func postTodo(c *gin.Context) {
 
 	key := c.PostForm("key")
