@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/antchfx/htmlquery"
 	"github.com/cavaliercoder/grab"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/gocolly/colly"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
@@ -125,6 +127,8 @@ func getOneTodo(c *gin.Context) {
 
 	name := c.Param("name")
 
+	fmt.Println(name)
+
 	if name == "" {
 		c.String(400, "getOneTodo get param error")
 		return
@@ -139,7 +143,7 @@ func getOneTodo(c *gin.Context) {
 
 	res, err := db.Client.Get(db.Ctx, name).Result()
 
-	if err != nil {
+	if err != redis.Nil {
 		c.Redirect(http.StatusMovedPermanently, res)
 	} else {
 		c.String(500, "getOneTodo get value error ")
@@ -425,17 +429,6 @@ func delDownload(c *gin.Context) {
 
 }
 
-func getShortUrl(c *gin.Context) {
-
-}
-
-func postShortUrl(c *gin.Context) {
-
-}
-
-func delShortUrl(c *gin.Context) {
-
-}
 func getDu(c *gin.Context) {
 	db := db{
 		Ctx:    nil,

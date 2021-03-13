@@ -18,16 +18,18 @@ func main() {
 	var logPath string
 
 	flag.StringVar(
-		&keyPath, "k", "/etc/nginx/notok.cf.key", "tls key path")
+		&keyPath, "k", "/etc/nginx/tls.key", "tls key path")
 
 	flag.StringVar(
-		&cerPath, "c", "/etc/nginx/notok.cf.cer", "tls cer path")
+		&cerPath, "c", "/etc/nginx/tls.cer", "tls cer path")
 
 	flag.StringVar(
 		&addr, "a", ":55557", "port")
 
 	flag.StringVar(
 		&logPath, "d", "./", "log path")
+
+	flag.Parse()
 
 	f, _ := os.Create(logPath + "/cbox.log")
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
@@ -75,12 +77,6 @@ func main() {
 		api.POST("/toDo", postTodo)
 
 		api.DELETE("/toDo/:name", delTodo)
-
-		api.GET("/shortUrl", getShortUrl)
-
-		api.POST("/shortUrl", postShortUrl)
-
-		api.DELETE("/shortUrl/:url", delShortUrl)
 
 		api.GET("download", getDownload)
 

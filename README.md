@@ -1,0 +1,18 @@
+~~~
+[GIN-debug] GET    /_cat/serverIp            --> main.getServerIp (3 handlers)
+[GIN-debug] GET    /_cat/clientIp            --> main.getClientIp (3 handlers)
+[GIN-debug] GET    /_cat/weather/:city       --> main.getWeather (3 handlers)
+[GIN-debug] GET    /_cat/toDoApiAddr         --> main.getToDoApiAddr (3 handlers)
+[GIN-debug] GET    /_cat/du                  --> main.getDu (3 handlers)
+[GIN-debug] GET    /do/led                   --> main.main.func1 (3 handlers)
+[GIN-debug] GET    /api/ping                 --> main.main.func2 (3 handlers)
+[GIN-debug] GET    /api/ithomeNews           --> main.getIthomeNew (3 handlers)
+[GIN-debug] POST   /api/ithomeNews           --> main.postIthomeNew (3 handlers)
+[GIN-debug] GET    /api/toDo                 --> main.getTodo (3 handlers)
+[GIN-debug] GET    /api/toDo/:name           --> main.getOneTodo (3 handlers)
+[GIN-debug] POST   /api/toDo                 --> main.postTodo (3 handlers)
+[GIN-debug] DELETE /api/toDo/:name           --> main.delTodo (3 handlers)
+[GIN-debug] GET    /api/download             --> main.getDownload (3 handlers)
+[GIN-debug] POST   /api/download             --> main.postDownload (3 handlers)
+[GIN-debug] DELETE /api/download/:filename   --> main.delDownload (3 handlers)
+~~~
